@@ -1,7 +1,9 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Form, Button, Tag, Input, DatePicker, Table } from 'antd';
+import { Form, Button, Tag, Input, DatePicker, Table, Upload } from 'antd';
 import router from 'umi/router';
+import { uploadFileUrl, baseurl } from '@/config';
+import path from 'path';
 import moment from 'moment';
 import styles from './style.less';
 
@@ -82,11 +84,15 @@ class Step2 extends PureComponent {
       this.state = {
         type: 'department',
         customers: group.department_customers || [],
+        fileList: [],
+        filePath: '',
       };
     } else {
       this.state = {
         type: 'person',
         customers: group.customers || [],
+        fileList: [],
+        filePath: '',
       };
     }
   }
@@ -120,7 +126,7 @@ class Step2 extends PureComponent {
     const { form, dispatch, group } = this.props;
     form.validateFields(async (error, values) => {
       if (!error) {
-        console.log(values);
+        const { filePath } = this.state;
         const data = {
           ...values,
           start_time: moment(values.start_time)
@@ -130,13 +136,39 @@ class Step2 extends PureComponent {
             .utc()
             .format(),
           groupId: group.id,
+          file: filePath,
         };
         await dispatch({
           type: 'sales/createActivity',
           payload: data,
         });
+        this.setState({
+          filePath: '',
+          fileList: [],
+        });
         router.push('/sales/step-form/target');
       }
+    });
+  };
+
+  handleUploadChange = info => {
+    const list = info.fileList.slice(-1);
+    const fileList = list.map(file => {
+      const temp = file;
+      if (file.response) {
+        // Component will show file.url as link
+        temp.url = file.response.url;
+        const {
+          result: { filePath },
+        } = file.response;
+        this.setState({
+          filePath: `${baseurl}/${filePath}`,
+        });
+      }
+      return temp;
+    });
+    this.setState({
+      fileList,
     });
   };
 
@@ -147,7 +179,7 @@ class Step2 extends PureComponent {
       group,
       submitting,
     } = this.props;
-    const { type, customers } = this.state;
+    const { type, customers, fileList } = this.state;
 
     return (
       <Fragment>
@@ -208,18 +240,20 @@ class Step2 extends PureComponent {
               ],
             })(<Input.TextArea placeholder="输入活动名称..." />)}
           </Form.Item>
-          <Form.Item label="活动目标">
-            {getFieldDecorator('target', {
-              rules: [
-                {
-                  required: true,
-                  message: '必须输入活动目标',
-                },
-              ],
-            })(<Input.TextArea placeholder="输入活动名称..." />)}
-          </Form.Item>
           <Form.Item label="备注">
             {getFieldDecorator('other_data')(<Input placeholder="输入活动名称..." />)}
+          </Form.Item>
+          <Form.Item label="附件">
+            <Upload
+              onChange={this.handleUploadChange}
+              fileList={fileList}
+              action={uploadFileUrl}
+              name="activityFile"
+            >
+              <Button type="primary" icon="upload">
+                上传附件
+              </Button>
+            </Upload>
           </Form.Item>
         </Form>
         <div className={styles.step2Actions}>

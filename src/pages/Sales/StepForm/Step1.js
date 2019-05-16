@@ -107,8 +107,12 @@ class Step1 extends React.PureComponent {
             message="进入下一步后，新建模版将不可修改！"
             style={{ marginBottom: 24 }}
           />
-          <Form.Item label="模版" {...formItemLayout}>
-            <Select value={selectedModel} placeholder="选择模版" onSelect={this.handleSelectModel}>
+          <Form.Item label="客户群" {...formItemLayout}>
+            <Select
+              value={selectedModel}
+              placeholder="选择客户群"
+              onSelect={this.handleSelectModel}
+            >
               {groups.map(group => (
                 <Option key={group.id} value={group.id}>
                   {group.name}

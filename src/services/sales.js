@@ -60,6 +60,7 @@ export async function createActivity({
   other_data: otherData,
   target,
   name,
+  file,
 }) {
   return request(`${baseurl}/activities`, {
     method: 'post',
@@ -71,6 +72,7 @@ export async function createActivity({
       other_data: otherData,
       target,
       name,
+      file,
     },
   });
 }
@@ -119,6 +121,7 @@ export async function updateActivity({
   description,
   target,
   other_data: otherData,
+  file,
 }) {
   return request(`${baseurl}/activities/${activityId}`, {
     method: 'put',
@@ -129,6 +132,53 @@ export async function updateActivity({
       description,
       target,
       other_data: otherData,
+      file,
+    },
+  });
+}
+// 获取客户参加过的活动
+export async function getCusotomerActivities(customerId) {
+  return request(`${baseurl}/activities/byCustomerId/${customerId}`);
+}
+
+export async function createContactRecord({ customerId, activityId, type }) {
+  return request(`${baseurl}/activities/${activityId}/records`, {
+    method: 'post',
+    data: {
+      customerId,
+      type,
+    },
+  });
+}
+export async function createMailRecord({ customerId, activityId, to, subject, html }) {
+  return request(`${baseurl}/activities/${activityId}/mailRecord`, {
+    method: 'post',
+    data: {
+      customerId,
+      to,
+      subject,
+      html,
+    },
+  });
+}
+export async function getCustomerActivityRecords({ activityId, customerId }) {
+  return request(`${baseurl}/activities/${activityId}/recordsByCustomer?customerId=${customerId}`);
+}
+export async function createActivityCutomerPriority({ customerId, activityId, priority }) {
+  return request(`${baseurl}/activities/${activityId}/customerPriority`, {
+    method: 'post',
+    data: {
+      customerId,
+      priority,
+    },
+  });
+}
+
+export async function updateRecord({ recordId, success }) {
+  return request(`${baseurl}/records/${recordId}`, {
+    method: 'put',
+    data: {
+      success,
     },
   });
 }

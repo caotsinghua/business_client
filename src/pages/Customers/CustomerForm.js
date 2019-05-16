@@ -1,17 +1,48 @@
 import React, { PureComponent } from 'react';
-import { Form, Input, InputNumber, DatePicker, Select, Card, Button, message, Tag } from 'antd';
+import {
+  Form,
+  Input,
+  InputNumber,
+  DatePicker,
+  Select,
+  Card,
+  Button,
+  message,
+  Tag,
+  Table,
+} from 'antd';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import DescriptionList from '@/components/DescriptionList';
 import { connect } from 'dva';
 import router from 'umi/router';
+import Link from 'umi/link';
 import moment from 'moment';
 import numeral from 'numeral';
+import Yuan from '@/utils/Yuan';
 import styles from './CustomerForm.less';
 
 const { Item: FormItem } = Form;
 const { Group: InputGroup } = Input;
 const { Option } = Select;
 const { Description } = DescriptionList;
+
+const formatStatus = status => {
+  const map = {
+    created: {
+      text: '未开始',
+      color: 'blue',
+    },
+    online: {
+      text: '已上线',
+      color: 'green',
+    },
+    offline: {
+      text: '已下线',
+      color: 'red',
+    },
+  };
+  return map[status];
+};
 @connect(({ loading, customers }) => ({
   currentCustomer: customers.currentCustomer,
   loadingCustomer: loading.models.customers,
@@ -181,7 +212,7 @@ class CustomerForm extends PureComponent {
             initialValue: moment(),
             rules: [
               {
-                required:true,
+                required: true,
                 validator: this.checkBirthday,
               },
             ],
@@ -400,7 +431,7 @@ class CustomerForm extends PureComponent {
 
   render() {
     const { loadingCustomer, currentCustomer } = this.props;
-    const { account } = currentCustomer;
+    const { account, activities } = currentCustomer;
     const content = <div>{this.customerId ? '查看和更新客户信息' : '新建一个客户'}</div>;
     return (
       <PageHeaderWrapper title="客户表单" content={content} loading={loadingCustomer}>
@@ -417,7 +448,9 @@ class CustomerForm extends PureComponent {
                 </Description>
               )}
               {this.type === 'department' && (
-                <Description term="注册资金">￥{numeral(account.register_money).format('0,0')}</Description>
+                <Description term="注册资金">
+                  ￥{numeral(account.register_money).format('0,0')}
+                </Description>
               )}
               <Description term="欠款">￥{numeral(account.debt).format('0,0')}</Description>
               <Description term="存款">￥{numeral(account.deposit).format('0,0')}</Description>
@@ -434,6 +467,41 @@ class CustomerForm extends PureComponent {
                 <Tag color="#108ee9">{account.back_ability}</Tag>
               </Description>
             </DescriptionList>
+          </Card>
+        ) : null}
+        {this.customerId && activities ? (
+          <Card title="参与过的活动">
+            <Table
+              rowKey="activityId"
+              dataSource={activities}
+              columns={[
+                {
+                  title: '编号',
+                  dataIndex: 'activityId',
+                },
+                {
+                  title: '活动名称',
+                  dataIndex: 'activity.name',
+                  render: (name, item) => (
+                    <Link to={`/sales/${item.activityId}/statistic`}>{name}</Link>
+                  ),
+                },
+                {
+                  title: '活动状态',
+                  dataIndex: 'activity.status',
+                  render: status => {
+                    return (
+                      <Tag color={formatStatus(status).color}>{formatStatus(status).text}</Tag>
+                    );
+                  },
+                },
+                {
+                  title: '投入资金',
+                  dataIndex: 'invest_money',
+                  render: money => <Yuan>{money}</Yuan>,
+                },
+              ]}
+            />
           </Card>
         ) : null}
         <Card bordered={false}>

@@ -9,6 +9,8 @@ import {
   createDepartmentCustomer,
 } from '@/services/customers';
 
+import { getCusotomerActivities } from '@/services/sales';
+
 export default {
   namespaced: 'customers',
   state: {
@@ -69,11 +71,15 @@ export default {
       { call, put }
     ) {
       const response = yield call(getCustomer, customerId);
-      if (response && response.success) {
+      const activitiesRes = yield call(getCusotomerActivities, customerId);
+      if (response && activitiesRes) {
         const { result } = response;
         yield put({
           type: 'setCustomer',
-          payload: result,
+          payload: {
+            ...result,
+            activities: activitiesRes.result,
+          },
         });
       }
     },

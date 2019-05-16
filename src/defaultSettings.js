@@ -1,6 +1,6 @@
 module.exports = {
   navTheme: 'dark',
-  primaryColor: '#25bb64',
+  primaryColor: '#1890FF',
   layout: 'topmenu',
   contentWidth: 'Fixed',
   fixedHeader: true,
@@ -9,8 +9,8 @@ module.exports = {
   menu: {
     disableLocal: false,
   },
-  title: '营销管理系统',
-  pwa: true,
+  title: '招行营销系统',
+  pwa: false,
   iconfontUrl: '',
   collapse: true,
 };

@@ -181,7 +181,7 @@ class Sales extends PureComponent {
 
   renderModalForm = () => {
     const { formKey, suggestions, searching, verifyStatus, nopassReason } = this.state;
-    if (formKey.indexOf('bind') != -1) {
+    if (formKey.indexOf('bind') !== -1) {
       return (
         <Mention
           suggestions={suggestions}
@@ -284,7 +284,7 @@ class Sales extends PureComponent {
 
   handleOk = async () => {
     const { formKey, currentItem, selectedId, verifyStatus, nopassReason } = this.state;
-    const { dispatch, page, pageSize } = this.props;
+    const { dispatch } = this.props;
     if (formKey === 'bindVerifyer') {
       const response = await dispatch({
         type: 'sales/bindVerifyer',

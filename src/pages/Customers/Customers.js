@@ -2,9 +2,10 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-import { Card, Form, Input, Button, Divider, Tag } from 'antd';
+import { Card, Form, Input, Button, Tag, Upload, Modal, Table, message, notification } from 'antd';
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { saveCustomers, saveDepartmentCustomers } from '@/services/customers';
 
 import styles from './Customers.less';
 
@@ -28,11 +29,6 @@ const tabList = [
 }))
 @Form.create()
 class Customers extends PureComponent {
-  state = {
-    selectedRows: [],
-    tabKey: 'person',
-  };
-
   columns = [
     {
       title: 'id',
@@ -58,9 +54,9 @@ class Customers extends PureComponent {
       title: '操作',
       render: item => (
         <Fragment>
-          <Link to={`/customers/${item.id}?type=person`}>编辑</Link>
-          <Divider type="vertical" />
-          <a>删除</a>
+          <Link to={`/customers/${item.id}?type=person`}>查看</Link>
+          {/* <Divider type="vertical" />
+          <a>删除</a> */}
         </Fragment>
       ),
     },
@@ -99,26 +95,47 @@ class Customers extends PureComponent {
       title: '操作',
       render: item => (
         <Fragment>
-          <Link to={`/customers/${item.id}?type=department`}>编辑</Link>
-          <Divider type="vertical" />
-          <a>删除</a>
+          <Link to={`/customers/${item.id}?type=department`}>查看</Link>
+          {/* <Divider type="vertical" />
+          <a>删除</a> */}
         </Fragment>
       ),
     },
   ];
 
+  constructor(props) {
+    super(props);
+     const {
+      location: {
+        query: { tabKey = 'person' },
+      },
+    } = props;
+    this.state = {
+      selectedRows: [],
+      tabKey,
+      fileList: [],
+      uploadList: [],
+      filename: '',
+      uploadTableVisible: false,
+      fileKey: '',
+      loadingSaving: false,
+    };
+  }
+
   componentDidMount() {
     const {
       location: {
-        query: { page = 1, pageSize = 10 },
+        query: { page = 1, pageSize = 10, tabKey = 'person' },
       },
     } = this.props;
-    const { tabKey } = this.state;
+    this.page = page;
+    this.pageSize = pageSize;
     this.fetchData(page, pageSize, tabKey);
   }
 
   handleTabChange = async key => {
     const { pageSize } = this.props;
+    router.replace(`/customers/list?tabKey=${key}&page=1&pageSize=${pageSize}`);
     await this.fetchData(1, pageSize, key);
     this.setState(state => ({
       ...state,
@@ -150,7 +167,79 @@ class Customers extends PureComponent {
     router.push(`/customers/new?type=${type}`);
   };
 
-  async fetchData(page, pageSize, type) {
+  handleFileChange = info => {
+    let fileList = [];
+    let uploadSuccess = false;
+    const list = info.fileList.slice(-1);
+    fileList = list.map(file => {
+      const temp = file;
+      if (file.response && file.response.success) {
+        // Component will show file.url as link
+        temp.url = file.response.url;
+        const {
+          result: { data, filename, key: fileKey },
+        } = file.response;
+        this.setState({
+          uploadList: data,
+          filename,
+          fileKey,
+        });
+        uploadSuccess = true;
+      } else if (file.response && !file.response.success) {
+        uploadSuccess = false;
+        const { error_code: status, error_message: errortext } = file.response;
+        notification.error({
+          message: `请求错误 ${status}`,
+          description: errortext,
+        });
+      }
+      return temp;
+    });
+
+    if (uploadSuccess) {
+      this.setState({ fileList, uploadTableVisible: true });
+    } else {
+      this.setState({ fileList, uploadTableVisible: false });
+    }
+  };
+
+  closeUploadModal = () => {
+    this.setState({
+      uploadTableVisible: false,
+    });
+  };
+
+  handleSubmitUpload = async () => {
+    const { fileKey, tabKey } = this.state;
+    this.setState({
+      loadingSaving: true,
+    });
+    const response =
+      tabKey === 'person' ? await saveCustomers(fileKey) : await saveDepartmentCustomers(fileKey);
+
+    if (response && response.success) {
+      message.success('导入成功');
+      const {
+        location: {
+          query: { page = 1, pageSize = 10 },
+        },
+      } = this.props;
+      this.fetchData(page, pageSize, tabKey);
+    }
+    this.setState({
+      loadingSaving: false,
+      fileList: [],
+    });
+    this.closeUploadModal();
+  };
+
+  handlePageChange = async (page, pageSize) => {
+    const { tabKey } = this.state;
+    router.replace(`/customers/list?tabKey=${tabKey}&page=${page}&pageSize=${pageSize}`);
+    this.fetchData(page, pageSize, tabKey);
+  };
+
+  fetchData = async (page, pageSize, type) => {
     const { dispatch } = this.props;
     if (type === 'person') {
       await dispatch({
@@ -169,14 +258,28 @@ class Customers extends PureComponent {
         },
       });
     }
-  }
+  };
 
   render() {
     const { data, loading, page, pageSize, total } = this.props;
-    const { selectedRows, tabKey } = this.state;
+    const {
+      selectedRows,
+      tabKey,
+      fileList,
+      uploadList,
+      filename,
+      uploadTableVisible,
+      loadingSaving,
+    } = this.state;
     const dataSource = {
       list: data,
-      pagination: { total, pageSize, current: page, showSizeChanger: false },
+      pagination: {
+        total,
+        pageSize,
+        current: page,
+        showSizeChanger: false,
+        onChange: this.handlePageChange,
+      },
     };
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
@@ -203,6 +306,15 @@ class Customers extends PureComponent {
               <Button icon="plus" type="primary" onClick={this.handleCreateCustomer}>
                 {tabKey === 'person' ? '添加客户' : '添加企业客户'}
               </Button>
+              <Upload
+                name="customersFile"
+                action="http://localhost:4000/upload/uploadCustomers"
+                onChange={this.handleFileChange}
+                fileList={fileList}
+                withCredentials
+              >
+                <Button icon="upload">导入客户源</Button>
+              </Upload>
             </div>
             <StandardTable
               selectedRows={selectedRows}
@@ -214,6 +326,72 @@ class Customers extends PureComponent {
             />
           </div>
         </Card>
+        <Modal
+          visible={uploadTableVisible}
+          onCancel={this.closeUploadModal}
+          onOk={this.handleSubmitUpload}
+          title={filename}
+          width="800px"
+          confirmLoading={loadingSaving}
+        >
+          <Table
+            rowKey="name"
+            dataSource={uploadList}
+            pagination={{ pageSize: 6 }}
+            columns={
+              tabKey === 'person'
+                ? [
+                    {
+                      title: '姓名',
+                      dataIndex: 'name',
+                    },
+                    {
+                      title: '性别',
+                      dataIndex: 'sex',
+                      render: sex => {
+                        return { male: '男', female: '女' }[sex];
+                      },
+                    },
+                    {
+                      title: '出生日期',
+                      dataIndex: 'birthday',
+                    },
+                    {
+                      title: '住址',
+                      dataIndex: 'address',
+                    },
+                    {
+                      title: '职业',
+                      dataIndex: 'job',
+                    },
+                    {
+                      title: '工作年限',
+                      dataIndex: 'work_time',
+                    },
+                  ]
+                : [
+                    {
+                      title: '机构名字',
+                      dataIndex: 'name',
+                      align: 'center',
+                    },
+                    {
+                      title: '机构类型',
+                      dataIndex: 'type',
+                      render: type => <Tag color="blue">{type}</Tag>,
+                    },
+                    {
+                      title: '描述',
+                      dataIndex: 'description',
+                    },
+                    {
+                      title: '法人',
+                      dataIndex: 'owner',
+                    },
+                  ]
+            }
+          />
+        </Modal>
       </PageHeaderWrapper>
     );
   }

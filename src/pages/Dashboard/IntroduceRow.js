@@ -30,11 +30,11 @@ const IntroduceRow = memo(({ loading, visitData }) => (
           </Tooltip>
         }
         loading={loading}
-        total={() => <Yuan>126560</Yuan>}
+        total={() => <Yuan>1268789560</Yuan>}
         footer={
           <Field
             label={<FormattedMessage id="app.analysis.day-sales" defaultMessage="Daily Sales" />}
-            value={`￥${numeral(12423).format('0,0')}`}
+            value={`￥${numeral(1242873).format('0,0')}`}
           />
         }
         contentHeight={46}
@@ -62,13 +62,8 @@ const IntroduceRow = memo(({ loading, visitData }) => (
             <Icon type="info-circle-o" />
           </Tooltip>
         }
-        total={numeral(8846).format('0,0')}
-        footer={
-          <Field
-            label="日新增客户数"
-            value={numeral(1234).format('0,0')}
-          />
-        }
+        total={numeral(889146).format('0,0')}
+        footer={<Field label="日新增客户数" value={numeral(1934).format('0,0')} />}
         contentHeight={46}
       >
         <MiniArea color="#975FE4" data={visitData} />

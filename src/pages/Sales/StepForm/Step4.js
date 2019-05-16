@@ -49,7 +49,7 @@ class Step4 extends React.PureComponent {
         verifyerId: selectVerifyerId,
       },
     });
-    if (response) router.push('/sales/step-form/result');
+    if (response) router.push(`/sales/step-form/result?activityId=${currentActivity.id}`);
     else message.error('提交失败');
   };
 

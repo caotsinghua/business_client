@@ -66,6 +66,7 @@ export default [
         name: 'banks',
         icon: 'bank',
         hideChildrenInMenu: true,
+        authority: ['root', 'leader'],
         routes: [
           {
             path: '/banks',
@@ -100,10 +101,11 @@ export default [
         name: 'customers',
         icon: 'user',
         hideChildrenInMenu: true,
+        authority: ['root', 'manager',  'leader'],
         routes: [
           {
             path: '/customers',
-            redirect: '/customers/list',
+            redirect: '/customers/list?tabKey=person',
           },
           {
             path: '/customers/list',

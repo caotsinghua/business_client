@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import Link from 'umi/link'
+import Link from 'umi/link';
 import { Card, Button, Icon, List, Modal, Form, Input, message, Tag } from 'antd';
 import { getAuthority } from '@/utils/authority';
 import Ellipsis from '@/components/Ellipsis';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import logo from '../../assets/logo.svg';
 import styles from './Banks.less';
 
 const { Item: FormItem } = Form;
@@ -113,17 +114,14 @@ class Banks extends Component {
             renderItem={item =>
               item ? (
                 <List.Item key={item.id}>
-                  <Card hoverable className={styles.card} actions={[<Link to={`/banks/${item.id}`}>进入管理</Link>]}>
+                  <Card
+                    hoverable
+                    className={styles.card}
+                    actions={[<Link to={`/banks/${item.id}`}>进入管理</Link>]}
+                  >
                     <Card.Meta
                       avatar={
-                        <img
-                          alt=""
-                          className={styles.cardAvatar}
-                          src={
-                            item.avatar ||
-                            'https://gw.alipayobjects.com/zos/rmsportal/sfjbOqnsXXJgNCjCzDBL.png'
-                          }
-                        />
+                        <img alt="" className={styles.cardAvatar} src={item.avatar || logo} />
                       }
                       title={<a>{item.name}</a>}
                       description={

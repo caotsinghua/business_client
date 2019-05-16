@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import FooterToolbar from '@/components/FooterToolbar';
 import { connect } from 'dva';
-import { Form, Input, DatePicker, Button, message, Tag, Tooltip, Modal } from 'antd';
+import { Form, Input, DatePicker, Button, message, Tag, Tooltip, Modal, Upload } from 'antd';
 import moment from 'moment';
 import router from 'umi/router';
+import { uploadFileUrl, baseurl } from '@/config';
 import styles from './Sales.less';
 
 const formItemLayout = {
@@ -46,6 +47,10 @@ class SaleForm extends Component {
       params: { saleActivityId },
     } = props.match;
     this.saleActivityId = saleActivityId;
+    this.state = {
+      fileList: [],
+      filePath: '',
+    };
   }
 
   async componentDidMount() {
@@ -80,9 +85,10 @@ class SaleForm extends Component {
     const { form, dispatch } = this.props;
     form.validateFields(async (error, values) => {
       if (!error) {
+        const { filePath } = this.state;
         const response = await dispatch({
           type: 'sales/updateActivity',
-          payload: { ...values, activityId: this.saleActivityId },
+          payload: { ...values, activityId: this.saleActivityId, file: filePath },
         });
         if (response) {
           message.success('更新完成');
@@ -140,6 +146,27 @@ class SaleForm extends Component {
     }
   };
 
+  handleUploadChange = info => {
+    const list = info.fileList.slice(-1);
+    const fileList = list.map(file => {
+      const temp = file;
+      if (file.response) {
+        // Component will show file.url as link
+        temp.url = file.response.url;
+        const {
+          result: { filePath },
+        } = file.response;
+        this.setState({
+          filePath: `${baseurl}/${filePath}`,
+        });
+      }
+      return temp;
+    });
+    this.setState({
+      fileList,
+    });
+  };
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -147,6 +174,7 @@ class SaleForm extends Component {
       loading,
       loadingChangeStatus,
     } = this.props;
+    const { fileList } = this.state;
     const { group } = currentActivity;
     return (
       <PageHeaderWrapper title="营销活动" content={<div>营销活动详情</div>} loading={loading}>
@@ -230,6 +258,19 @@ class SaleForm extends Component {
               disabled
             />
           </Form.Item>
+          <Form.Item label="附件">
+            {currentActivity.file && <a href={currentActivity.file}>下载附件</a>}
+            <Upload
+              onChange={this.handleUploadChange}
+              fileList={fileList}
+              action={uploadFileUrl}
+              name="activityFile"
+            >
+              <Button type="primary" icon="upload">
+                上传附件
+              </Button>
+            </Upload>
+          </Form.Item>
         </Form>
         <FooterToolbar extra="表单操作">
           <Button type="primary" icon="edit" onClick={this.handleSubmit}>
@@ -239,7 +280,9 @@ class SaleForm extends Component {
             type={currentActivity.status === 'online' ? 'danger' : 'primary'}
             onClick={this.handleUpdateStatus}
             loading={loadingChangeStatus}
-            disabled={!(currentActivity.verify_data&&currentActivity.verify_data.verify_status==='pass')}
+            disabled={
+              !(currentActivity.verify_data && currentActivity.verify_data.verify_status === 'pass')
+            }
           >
             {currentActivity.status === 'online' ? '下线' : '上线'}
           </Button>

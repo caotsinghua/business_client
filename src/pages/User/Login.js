@@ -6,7 +6,7 @@ import { Checkbox, Alert, Icon } from 'antd';
 import Login from '@/components/Login';
 import styles from './Login.less';
 
-const {  UserName, Password,  Submit } = Login;
+const { UserName, Password, Submit } = Login;
 
 @connect(({ login, loading }) => ({
   login,
@@ -41,7 +41,7 @@ class LoginPage extends Component {
 
   render() {
     const { login, submitting } = this.props;
-    const {  autoLogin } = this.state;
+    const { autoLogin } = this.state;
     return (
       <div className={styles.main}>
         <Login
@@ -53,7 +53,7 @@ class LoginPage extends Component {
           <h3>
             <FormattedMessage id="app.login.tab-login-credentials" />
           </h3>
-          {login.status === 'error'  &&
+          {login.status === 'error' &&
             !submitting &&
             this.renderMessage(formatMessage({ id: 'app.login.message-invalid-credentials' }))}
           <UserName
@@ -92,10 +92,10 @@ class LoginPage extends Component {
             <FormattedMessage id="app.login.login" />
           </Submit>
           <div className={styles.other}>
-            <FormattedMessage id="app.login.sign-in-with" />
+            {/* <FormattedMessage id="app.login.sign-in-with" />
             <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
             <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
-            <Icon type="weibo-circle" className={styles.icon} theme="outlined" />
+            <Icon type="weibo-circle" className={styles.icon} theme="outlined" /> */}
             <Link className={styles.register} to="/user/register">
               <FormattedMessage id="app.login.signup" />
             </Link>

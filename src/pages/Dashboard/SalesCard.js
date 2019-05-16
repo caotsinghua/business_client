@@ -8,13 +8,40 @@ import { Bar } from '@/components/Charts';
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
-const rankingListData = [];
-for (let i = 0; i < 7; i += 1) {
-  rankingListData.push({
-    title: `信大银行第${i + 1}支行`,
-    total: 323234,
-  });
-}
+const rankingListData = [
+  {
+    title: `招商银行总行`,
+    total: 835,
+  },
+  {
+    title: `招商银行南京分行`,
+    total: 623,
+  },
+  {
+    title: `招商银行南京分行第一支行`,
+    total: 617,
+  },
+  {
+    title: `招商银行北京分行第一支行`,
+    total: 593,
+  },
+  {
+    title: `招商银行浙江分行`,
+    total: 481,
+  },
+  {
+    title: `招商银行江苏分行`,
+    total: 399,
+  },
+  {
+    title: `招商银行河北分行`,
+    total: 361,
+  },
+  {
+    title: `招商银行安徽分行`,
+    total: 320,
+  },
+];
 
 const SalesCard = memo(
   ({ rangePickerValue, salesData, handleRangePickerChange, loading, selectDate }) => (

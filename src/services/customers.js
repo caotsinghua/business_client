@@ -144,3 +144,21 @@ export async function updateDepartmentCustomer({
     },
   });
 }
+
+export async function saveCustomers(key) {
+  return request(`${baseurl}/upload/saveUploadedCustomers`,{
+    method:'post',
+    data:{
+      key
+    }
+  });
+}
+
+export async function saveDepartmentCustomers(key){
+  return request(`${baseurl}/upload/saveUploadedDepartmentCustomers`,{
+    method:'post',
+    data:{
+      key
+    }
+  })
+}

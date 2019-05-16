@@ -40,3 +40,11 @@ export async function joinActivity({ activityId, customerId, money }) {
     },
   });
 }
+
+export async function getRecords({ activityId, customerId }) {
+  return request(`${baseurl}/activities/${activityId}/recordsByCustomer?customerId=${customerId}`);
+}
+
+export async function exportData(activityId){
+  return request(`${baseurl}/statistic/${activityId}/export`)
+}
