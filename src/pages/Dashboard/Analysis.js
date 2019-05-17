@@ -1,6 +1,5 @@
 import React, { Component, Suspense } from 'react';
 import { connect } from 'dva';
-import {  Icon, Menu, Dropdown } from 'antd';
 import GridContent from '@/components/PageHeaderWrapper/GridContent';
 import { getTimeDistance } from '@/utils/utils';
 import styles from './Analysis.less';
@@ -91,37 +90,37 @@ class Analysis extends Component {
     const { chart, loading } = this.props;
     const {
       visitData,
-      visitData2,
+      // visitData2,
       salesData,
-      searchData,
-      offlineData,
-      offlineChartData,
-      salesTypeData,
-      salesTypeDataOnline,
-      salesTypeDataOffline,
+      // searchData,
+      // offlineData,
+      // offlineChartData,
+      // salesTypeData,
+      // salesTypeDataOnline,
+      // salesTypeDataOffline,
     } = chart;
-    let salesPieData;
-    if (salesType === 'all') {
-      salesPieData = salesTypeData;
-    } else {
-      salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
-    }
-    const menu = (
-      <Menu>
-        <Menu.Item>操作一</Menu.Item>
-        <Menu.Item>操作二</Menu.Item>
-      </Menu>
-    );
+    // let salesPieData;
+    // if (salesType === 'all') {
+    //   salesPieData = salesTypeData;
+    // } else {
+    //   salesPieData = salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline;
+    // }
+    // const menu = (
+    //   <Menu>
+    //     <Menu.Item>操作一</Menu.Item>
+    //     <Menu.Item>操作二</Menu.Item>
+    //   </Menu>
+    // );
 
-    const dropdownGroup = (
-      <span className={styles.iconGroup}>
-        <Dropdown overlay={menu} placement="bottomRight">
-          <Icon type="ellipsis" />
-        </Dropdown>
-      </span>
-    );
+    // const dropdownGroup = (
+    //   <span className={styles.iconGroup}>
+    //     <Dropdown overlay={menu} placement="bottomRight">
+    //       <Icon type="ellipsis" />
+    //     </Dropdown>
+    //   </span>
+    // );
 
-    const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
+    // const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
 
     return (
       <GridContent>
@@ -138,24 +137,6 @@ class Analysis extends Component {
             selectDate={this.selectDate}
           />
         </Suspense>
-        {/* <Suspense fallback={null}>
-                <ProportionSales
-                  dropdownGroup={dropdownGroup}
-                  salesType={salesType}
-                  loading={loading}
-                  salesPieData={salesPieData}
-                  handleChangeSalesType={this.handleChangeSalesType}
-                />
-              </Suspense>
-        <Suspense fallback={null}>
-          <OfflineData
-            activeKey={activeKey}
-            loading={loading}
-            offlineData={offlineData}
-            offlineChartData={offlineChartData}
-            handleTabChange={this.handleTabChange}
-          />
-        </Suspense> */}
       </GridContent>
     );
   }

@@ -343,6 +343,16 @@ class Sales extends PureComponent {
     });
   };
 
+  getBannerStatistic = () => {
+    const { list } = this.props;
+    const createdData = list.filter(item => item.status === 'created');
+    const onlineData = list.filter(item => item.status === 'online');
+    return {
+      online: onlineData.length,
+      created: createdData.length,
+    };
+  };
+
   handleChangePage = async (page, pageSize) => {
     await this.fetchData(page, pageSize);
     const { list } = this.props;
@@ -354,6 +364,7 @@ class Sales extends PureComponent {
   render() {
     const { total, page, pageSize, loading } = this.props;
     const { filterActivities, filterType, visible } = this.state;
+
     const handleMenuClick = (key, currentItem) => {
       this.setState({
         formKey: key,
@@ -459,13 +470,17 @@ class Sales extends PureComponent {
           <Card bordered={false}>
             <Row>
               <Col sm={8} xs={24}>
-                <Info title="我的营销活动" value="188个活动" bordered />
+                <Info title="我的营销活动" value={`${total}个活动`} bordered />
               </Col>
               <Col sm={8} xs={24}>
-                <Info title="待处理活动" value="8个活动" bordered />
+                <Info
+                  title="待处理活动"
+                  value={`${this.getBannerStatistic().created}个活动`}
+                  bordered
+                />
               </Col>
               <Col sm={8} xs={24}>
-                <Info title="进行中活动" value="24个活动" />
+                <Info title="进行中活动" value={`${this.getBannerStatistic().online}个活动`} />
               </Col>
             </Row>
           </Card>

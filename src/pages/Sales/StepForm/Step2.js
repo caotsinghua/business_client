@@ -40,9 +40,12 @@ class Step2 extends PureComponent {
       render: sex => this.getSex(sex),
     },
     {
-      title: '客户经理',
-      dataIndex: 'manager',
-      render: manager => (manager && manager.name) || <Tag color="red">无客户经理</Tag>,
+      title: '工作',
+      dataIndex: 'job',
+    },
+    {
+      title: '备注',
+      dataIndex: 'description',
     },
   ];
 

@@ -6,7 +6,7 @@ import { Card, Form, Input, Button, Tag, Upload, Modal, Table, message, notifica
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { saveCustomers, saveDepartmentCustomers } from '@/services/customers';
-
+import { uploadCustomersUrl } from '@/config';
 import styles from './Customers.less';
 
 const tabList = [
@@ -105,7 +105,7 @@ class Customers extends PureComponent {
 
   constructor(props) {
     super(props);
-     const {
+    const {
       location: {
         query: { tabKey = 'person' },
       },
@@ -308,7 +308,7 @@ class Customers extends PureComponent {
               </Button>
               <Upload
                 name="customersFile"
-                action="http://localhost:4000/upload/uploadCustomers"
+                action={uploadCustomersUrl}
                 onChange={this.handleFileChange}
                 fileList={fileList}
                 withCredentials
